@@ -1,0 +1,44 @@
+{
+  "manager": [
+    "KIWOOM",
+    "RISE",
+    "미래에셋자산운용",
+    "삼성자산운용",
+    "신한자산운용",
+    "한국투자신탁운용"
+  ],
+  "min_score": 0.7,
+  "exclude_risky": true,
+  "bt_h_start_str": "2025-12-26",
+  "bt_h_end_str": "2026-01-05",
+  "bt_date_str": "2026-01-05",
+  "bt_top_n": 20,
+  "adv_manager": [
+    "KIWOOM",
+    "RISE",
+    "미래에셋자산운용",
+    "삼성자산운용",
+    "한국투자신탁운용",
+    "신한자산운용"
+  ],
+  "adv_start_str": "2025-01-01",
+  "adv_end_str": "2026-01-02",
+  "adv_etf_score": 0.7,
+  "adv_etf_ma": 20,
+  "adv_stock_ma": 60,
+  "adv_overlap": 3,
+  "adv_cap": 100000000,
+  "adv_amt": 5000000,
+  "curr_manager": [
+    "KIWOOM",
+    "RISE",
+    "미래에셋자산운용",
+    "삼성자산운용",
+    "신한자산운용",
+    "한국투자신탁운용"
+  ],
+  "curr_score": 0.7,
+  "curr_risk": true,
+  "curr_top_n": 20,
+  "top_n_etf": 20
+}

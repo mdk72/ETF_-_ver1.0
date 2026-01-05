@@ -1,0 +1,653 @@
+[
+  {
+    "ticker": "305720",
+    "name": "KODEX 2차전지산업",
+    "type": "테마/기타",
+    "net_assets": 14480,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "292150",
+    "name": "TIGER 코리아TOP10",
+    "type": "테마/우량주",
+    "net_assets": 13791,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "449450",
+    "name": "PLUS K방산",
+    "type": "테마/기타",
+    "net_assets": 12190,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "487240",
+    "name": "KODEX AI전력핵심설비",
+    "type": "테마/기타",
+    "net_assets": 11106,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "305540",
+    "name": "TIGER 2차전지테마",
+    "type": "테마/기타",
+    "net_assets": 10450,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "462010",
+    "name": "TIGER 2차전지소재Fn",
+    "type": "테마/기타",
+    "net_assets": 6508,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "445290",
+    "name": "KODEX 로봇액티브",
+    "type": "테마/기타",
+    "net_assets": 5222,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "434730",
+    "name": "HANARO 원자력iSelect",
+    "type": "테마/기타",
+    "net_assets": 5186,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "364980",
+    "name": "TIGER 2차전지TOP10",
+    "type": "테마/기타",
+    "net_assets": 4883,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "495050",
+    "name": "RISE 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 3912,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "444200",
+    "name": "SOL 코리아메가테크액티브",
+    "type": "테마/기타",
+    "net_assets": 3719,
+    "manager": "신한자산운용"
+  },
+  {
+    "ticker": "495850",
+    "name": "KODEX 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 3089,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "475050",
+    "name": "ACE KPOP포커스",
+    "type": "테마/기타",
+    "net_assets": 2665,
+    "manager": "한국투자신탁운용"
+  },
+  {
+    "ticker": "463250",
+    "name": "TIGER K방산&우주",
+    "type": "테마/기타",
+    "net_assets": 2601,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "461950",
+    "name": "KODEX 2차전지핵심소재10",
+    "type": "테마/기타",
+    "net_assets": 2111,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "422420",
+    "name": "RISE 2차전지액티브",
+    "type": "테마/기타",
+    "net_assets": 2046,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "385510",
+    "name": "KODEX 신재생에너지액티브",
+    "type": "테마/녹색성장",
+    "net_assets": 1923,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "496080",
+    "name": "TIGER 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 1675,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "455860",
+    "name": "SOL 2차전지소부장Fn",
+    "type": "테마/기타",
+    "net_assets": 1412,
+    "manager": "신한자산운용"
+  },
+  {
+    "ticker": "433500",
+    "name": "ACE 원자력TOP10",
+    "type": "테마/기타",
+    "net_assets": 1263,
+    "manager": "한국투자신탁운용"
+  },
+  {
+    "ticker": "364960",
+    "name": "TIGER BBIG",
+    "type": "테마/기타",
+    "net_assets": 1232,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "367770",
+    "name": "RISE 수소경제테마",
+    "type": "테마/기타",
+    "net_assets": 1176,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "290130",
+    "name": "RISE ESG사회책임투자",
+    "type": "테마/SRI",
+    "net_assets": 1112,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "0086B0",
+    "name": "TIGER 리츠부동산인프라TOP10액티브",
+    "type": "테마/기타",
+    "net_assets": 1048,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "476070",
+    "name": "KODEX 글로벌비만치료제TOP2 Plus",
+    "type": "테마/기타",
+    "net_assets": 789,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "395170",
+    "name": "KODEX Top10동일가중",
+    "type": "테마/우량주",
+    "net_assets": 774,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "495230",
+    "name": "KoAct 코리아밸류업액티브",
+    "type": "테마/기타",
+    "net_assets": 772,
+    "manager": "KOACT"
+  },
+  {
+    "ticker": "496090",
+    "name": "KIWOOM 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 747,
+    "manager": "KIWOOM"
+  },
+  {
+    "ticker": "377990",
+    "name": "TIGER Fn신재생에너지",
+    "type": "테마/녹색성장",
+    "net_assets": 744,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "419890",
+    "name": "KIWOOM 단기채권ESG액티브",
+    "type": "테마/SRI",
+    "net_assets": 691,
+    "manager": "KIWOOM"
+  },
+  {
+    "ticker": "495550",
+    "name": "SOL 코리아밸류업TR",
+    "type": "테마/기타",
+    "net_assets": 676,
+    "manager": "신한자산운용"
+  },
+  {
+    "ticker": "445150",
+    "name": "KODEX 친환경조선해운액티브",
+    "type": "테마/기타",
+    "net_assets": 668,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "421320",
+    "name": "PLUS 우주항공&UAM",
+    "type": "테마/기타",
+    "net_assets": 629,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "495330",
+    "name": "1Q 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 617,
+    "manager": "1Q"
+  },
+  {
+    "ticker": "337160",
+    "name": "KODEX 200ESG",
+    "type": "테마/SRI",
+    "net_assets": 589,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "322400",
+    "name": "HANARO e커머스",
+    "type": "테마/기타",
+    "net_assets": 565,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "410870",
+    "name": "TIMEFOLIO K컬처액티브",
+    "type": "테마/기타",
+    "net_assets": 564,
+    "manager": "타임폴리오자산운용"
+  },
+  {
+    "ticker": "465330",
+    "name": "RISE 2차전지TOP10",
+    "type": "테마/기타",
+    "net_assets": 557,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "479850",
+    "name": "HANARO K-뷰티",
+    "type": "테마/기타",
+    "net_assets": 548,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "486240",
+    "name": "DAISHIN343 AI반도체&인프라액티브",
+    "type": "테마/기타",
+    "net_assets": 495,
+    "manager": "DAISHIN343"
+  },
+  {
+    "ticker": "495060",
+    "name": "TIMEFOLIO 코리아밸류업액티브",
+    "type": "테마/기타",
+    "net_assets": 471,
+    "manager": "타임폴리오자산운용"
+  },
+  {
+    "ticker": "495040",
+    "name": "PLUS 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 443,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "457990",
+    "name": "PLUS 태양광&ESS",
+    "type": "테마/녹색성장",
+    "net_assets": 402,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "495750",
+    "name": "HANARO 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 389,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "0005D0",
+    "name": "SOL 전고체배터리&실리콘음극재",
+    "type": "테마/기타",
+    "net_assets": 379,
+    "manager": "신한자산운용"
+  },
+  {
+    "ticker": "300950",
+    "name": "KODEX 게임산업",
+    "type": "테마/기타",
+    "net_assets": 375,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "368190",
+    "name": "HANARO Fn K-뉴딜디지털플러스",
+    "type": "테마/기타",
+    "net_assets": 368,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "375770",
+    "name": "KODEX 탄소효율그린뉴딜",
+    "type": "테마/녹색성장",
+    "net_assets": 359,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "487130",
+    "name": "KoAct AI인프라액티브",
+    "type": "테마/기타",
+    "net_assets": 329,
+    "manager": "KOACT"
+  },
+  {
+    "ticker": "471780",
+    "name": "TIGER 코리아테크액티브",
+    "type": "테마/기타",
+    "net_assets": 318,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "300640",
+    "name": "RISE 게임테마",
+    "type": "테마/기타",
+    "net_assets": 317,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "385590",
+    "name": "ACE ESG액티브",
+    "type": "테마/SRI",
+    "net_assets": 305,
+    "manager": "한국투자신탁운용"
+  },
+  {
+    "ticker": "385520",
+    "name": "KODEX 자율주행액티브",
+    "type": "테마/기타",
+    "net_assets": 213,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "427120",
+    "name": "RISE AI플랫폼",
+    "type": "테마/기타",
+    "net_assets": 192,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "488200",
+    "name": "KIWOOM K-2차전지북미공급망",
+    "type": "테마/기타",
+    "net_assets": 182,
+    "manager": "KIWOOM"
+  },
+  {
+    "ticker": "442090",
+    "name": "에셋플러스 코리아대장장이액티브",
+    "type": "테마/기타",
+    "net_assets": 178,
+    "manager": "에셋플러스"
+  },
+  {
+    "ticker": "385600",
+    "name": "ACE 2차전지&친환경차액티브",
+    "type": "테마/기타",
+    "net_assets": 175,
+    "manager": "한국투자신탁운용"
+  },
+  {
+    "ticker": "300610",
+    "name": "TIGER K게임",
+    "type": "테마/기타",
+    "net_assets": 170,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "407820",
+    "name": "에셋플러스 코리아플랫폼액티브",
+    "type": "테마/기타",
+    "net_assets": 168,
+    "manager": "에셋플러스"
+  },
+  {
+    "ticker": "417630",
+    "name": "TIGER KEDI혁신기업ESG30",
+    "type": "테마/SRI",
+    "net_assets": 166,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "387280",
+    "name": "TIGER 퓨처모빌리티액티브",
+    "type": "테마/기타",
+    "net_assets": 157,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "496120",
+    "name": "ACE 코리아밸류업",
+    "type": "테마/기타",
+    "net_assets": 157,
+    "manager": "한국투자신탁운용"
+  },
+  {
+    "ticker": "381560",
+    "name": "HANARO Fn전기&수소차",
+    "type": "테마/기타",
+    "net_assets": 149,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "376410",
+    "name": "TIGER 탄소효율그린뉴딜",
+    "type": "테마/녹색성장",
+    "net_assets": 148,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "422260",
+    "name": "VITA MZ소비액티브",
+    "type": "테마/기타",
+    "net_assets": 148,
+    "manager": "VITA"
+  },
+  {
+    "ticker": "446700",
+    "name": "RISE 배터리 리사이클링",
+    "type": "테마/기타",
+    "net_assets": 145,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "404260",
+    "name": "KODEX 기후변화솔루션",
+    "type": "테마/녹색성장",
+    "net_assets": 144,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "364690",
+    "name": "KODEX 혁신기술테마액티브",
+    "type": "테마/기타",
+    "net_assets": 139,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "375760",
+    "name": "HANARO 탄소효율그린뉴딜",
+    "type": "테마/녹색성장",
+    "net_assets": 133,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "395150",
+    "name": "KODEX 웹툰&드라마",
+    "type": "테마/기타",
+    "net_assets": 126,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "404120",
+    "name": "TIMEFOLIO K신재생에너지액티브",
+    "type": "테마/녹색성장",
+    "net_assets": 124,
+    "manager": "타임폴리오자산운용"
+  },
+  {
+    "ticker": "104520",
+    "name": "KIWOOM 블루칩",
+    "type": "테마/우량주",
+    "net_assets": 119,
+    "manager": "KIWOOM"
+  },
+  {
+    "ticker": "229720",
+    "name": "KODEX KTOP30",
+    "type": "테마/우량주",
+    "net_assets": 118,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "457930",
+    "name": "BNK 미래전략기술액티브",
+    "type": "테마/기타",
+    "net_assets": 112,
+    "manager": "BNK"
+  },
+  {
+    "ticker": "395760",
+    "name": "PLUS ESG성장주액티브",
+    "type": "테마/SRI",
+    "net_assets": 112,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "140580",
+    "name": "RISE 우량업종대표주",
+    "type": "테마/우량주",
+    "net_assets": 109,
+    "manager": "RISE"
+  },
+  {
+    "ticker": "413930",
+    "name": "WON AI ESG액티브",
+    "type": "테마/SRI",
+    "net_assets": 109,
+    "manager": "우리자산운용"
+  },
+  {
+    "ticker": "228820",
+    "name": "TIGER KTOP30",
+    "type": "테마/우량주",
+    "net_assets": 107,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "466810",
+    "name": "BNK 2차전지양극재",
+    "type": "테마/기타",
+    "net_assets": 100,
+    "manager": "BNK"
+  },
+  {
+    "ticker": "496130",
+    "name": "TRUSTON 코리아밸류업액티브",
+    "type": "테마/기타",
+    "net_assets": 99,
+    "manager": "TRUSTON"
+  },
+  {
+    "ticker": "404650",
+    "name": "SOL KRX기후변화솔루션",
+    "type": "테마/녹색성장",
+    "net_assets": 96,
+    "manager": "신한자산운용"
+  },
+  {
+    "ticker": "385710",
+    "name": "TIMEFOLIO K이노베이션액티브",
+    "type": "테마/기타",
+    "net_assets": 96,
+    "manager": "타임폴리오자산운용"
+  },
+  {
+    "ticker": "285690",
+    "name": "FOCUS ESG리더스",
+    "type": "테마/SRI",
+    "net_assets": 95,
+    "manager": "브이아이자산운용"
+  },
+  {
+    "ticker": "449680",
+    "name": "TIGER 한중전기차(합성)",
+    "type": "테마/기타",
+    "net_assets": 93,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "404540",
+    "name": "TIGER KRX기후변화솔루션",
+    "type": "테마/녹색성장",
+    "net_assets": 89,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "368680",
+    "name": "KODEX K-뉴딜디지털플러스",
+    "type": "테마/기타",
+    "net_assets": 85,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "227570",
+    "name": "TIGER 우량가치",
+    "type": "테마/우량주",
+    "net_assets": 77,
+    "manager": "미래에셋자산운용"
+  },
+  {
+    "ticker": "450180",
+    "name": "KODEX 한중전기차(합성)",
+    "type": "테마/기타",
+    "net_assets": 73,
+    "manager": "삼성자산운용"
+  },
+  {
+    "ticker": "395750",
+    "name": "PLUS ESG가치주액티브",
+    "type": "테마/SRI",
+    "net_assets": 65,
+    "manager": "PLUS"
+  },
+  {
+    "ticker": "381570",
+    "name": "HANARO Fn친환경에너지",
+    "type": "테마/녹색성장",
+    "net_assets": 63,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "314700",
+    "name": "HANARO 농업융복합산업",
+    "type": "테마/기타",
+    "net_assets": 59,
+    "manager": "NH-Amundi자산운용"
+  },
+  {
+    "ticker": "482030",
+    "name": "KoAct 반도체&2차전지핵심소재액티브",
+    "type": "테마/기타",
+    "net_assets": 54,
+    "manager": "KOACT"
+  },
+  {
+    "ticker": "407300",
+    "name": "HANARO Fn골프테마",
+    "type": "테마/기타",
+    "net_assets": 51,
+    "manager": "NH-Amundi자산운용"
+  }
+]
