@@ -231,7 +231,7 @@ def analyze_overlapping_stocks_report(selected_etfs, top_n=10, ref_date=None, et
         if ref_date:
             try:
                 # 데이터 캐싱 조회 최적화 (범위 축소)
-                start_dt = pd.Timestamp(ref_date) - timedelta(days=120) 
+                start_dt = pd.Timestamp(ref_date) - timedelta(days=150) 
                 df = get_stock_data_cached(ticker, start_dt, datetime.now())
                 
                 if not df.empty:

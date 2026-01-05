@@ -108,7 +108,7 @@ def _render_holdings_table_section(col, ticker):
         # 성과 지표 포함 가공
         processed = []
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=90)
+        start_date = end_date - timedelta(days=130)
         
         for h in holdings:
             h_ticker = h['ticker']
