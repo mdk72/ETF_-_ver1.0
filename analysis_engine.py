@@ -305,7 +305,14 @@ def run_simulation(start_date, end_date, universe, min_score, selected_manager, 
     total_steps = len(dates)
     
     # 맵 전역 이름을 위해 복사 (lookup 속도 향상)
-    etf_name_map = {t: data_map[t]['Name'].iloc[-1] for t in data_map if not data_map[t].empty}
+    # 맵 전역 이름을 위해 복사 (lookup 속도 향상) - Name 컬럼 부재 시 안전 처리
+    etf_name_map = {}
+    for t, df in data_map.items():
+        if df.empty: continue
+        if 'Name' in df.columns:
+            etf_name_map[t] = df['Name'].iloc[-1]
+        else:
+            etf_name_map[t] = ETF_UNIVERSE.get(t, {}).get('name', t)
     
     for i, curr_dt in enumerate(dates):
         curr_date = curr_dt.date()
