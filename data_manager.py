@@ -114,7 +114,7 @@ def run_data_update():
     
     # 1. ETF 목록 갱신
     status_cont.info("📋 ETF 전체 목록 갱신 중... (Seibro/Naver)")
-    new_universe_list = updater_utils.update_etf_list_seibro_param() 
+    new_universe_list = updater_utils.fetch_latest_etf_list() 
     
     # DB에 유니버스 정보 저장
     save_etf_universe(new_universe_list)
