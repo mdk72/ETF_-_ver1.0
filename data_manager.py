@@ -81,10 +81,9 @@ def fetch_market_data(days=2500):
         return ticker, None
 
     # 3. ThreadPoolExecutor (최적화된 병렬 실행)
-    # [FILTER] 최적화를 위해 시가총액 200억 미만은 로딩 제외
     sorted_tickers = [
         t for t in sorted(ETF_UNIVERSE.keys()) 
-        if ETF_UNIVERSE.get(t, {}).get('net_assets', 0) >= 200
+        if ETF_UNIVERSE.get(t, {}).get('net_assets', 0) >= 50
     ]
     total = len(sorted_tickers)
     
