@@ -115,6 +115,7 @@ def get_all_etfs():
                     'name': row['name'],
                     'theme': row['theme'],
                     'manager': row['manager'],
+                    'net_assets': row['net_assets'],
                     'desc': f"{row['manager']} | {row['net_assets']}억"
                 }
             return universe
