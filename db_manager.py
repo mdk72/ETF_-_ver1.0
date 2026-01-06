@@ -65,6 +65,9 @@ def save_etf_universe(data_list):
         cursor = conn.cursor()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
+        # [Fix] 기존 목록 삭제 후 재저장 (필터링된 목록만 유지하기 위함)
+        cursor.execute('DELETE FROM etf_universe')
+        
         for item in data_list:
             cursor.execute('''
                 INSERT OR REPLACE INTO etf_universe (ticker, name, theme, manager, net_assets, updated_at)
