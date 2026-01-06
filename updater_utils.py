@@ -40,104 +40,80 @@ def backup_data_files():
             
     return []
 
+
+# [User Request Update] 
+# 사용자가 제공한 'etf_list.xlsx' (93종목)이 Single Source of Truth입니다.
+# 더 이상 크롤링/필터링 로직을 사용하지 않고, 파일 내용을 그대로 DB에 반영합니다.
+
 def update_etf_list_seibro_param():
     """
-    네이버 금융 ETF > 테마/섹터 탭(etfType=2)의 데이터를 직접 크롤링합니다 (API 사용).
-    Seibro의 테마 분류와 가장 유사하며, 순자산 50억 이상만 필터링합니다.
+    etf_list.xlsx 파일에서 종목명을 읽어와 FDR 마스터 정보와 매핑하여 반환합니다.
     """
-    import requests
+    import pandas as pd
+    import FinanceDataReader as fdr
+    import os
     
-    # Naver Finance Internal API URL
-    url = "https://finance.naver.com/api/sise/etfItemList.nhn?etfType=2&targetColumn=market_sum&sortOrder=desc"
+    file_path = "etf_list.xlsx"
     
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Referer': 'https://finance.naver.com/sise/etf.naver'
-        }
-        resp = requests.get(url, headers=headers, timeout=5)
-        data = resp.json()
-        
-        if data['resultCode'] != 'success':
-            print("Naver API Error")
-            return []
-            
-        items = data['result']['etfItemList']
-        
-    except Exception as e:
-        print(f"Naver Crawl Error: {e}")
+    if not os.path.exists(file_path):
+        print(f"Error: {file_path} not found.")
         return []
         
-    filtered_list = []
-    
-    # 제외 키워드 (순수 테마가 아닌 것들)
-    # 200 IT, 200 Energy 등 KOSPI 200 섹터 지수 상품은 '테마'라기보다 '섹터'임.
-    # 하지만 사용자는 '반도체', '2차전지' 등을 원함.
-    # 너무 엄격하게 자르면 TIGER 200 IT(반도체 포함) 같은게 날아감.
-    # 일단 '테마/섹터' 탭에 있는 것들은 다 포함하되, 너무 작은 것만 자름.
-    
-    filtered_list = []
-    
-    # [User Request] Seibro "테마" 탭에 있는 ~93개 종목과 일치시키기
-    # Seibro는 '섹터'와 '테마'를 구분함 (예: 반도체=섹터, 2차전지=테마)
-    # Naver '테마/섹터' 탭(281개)에서 Seibro식 '섹터', '스타일', '그룹주' 등을 제외하여 93개 추출
-    
-    exclude_keywords = [
-        # 1. Market/Index Linked (시장지수)
-        '200', 'KRX', 'MSCI', 'KOSDAQ150', '코스닥150', '지수', 'Core', 'Total Return', 'TR',
+    try:
+        # [Step 1] Read Excel
+        # Header issue in testing: columns might be garbage unicode if file has weird encoding.
+        # But pandas usually handles xlsx well. 
+        # Inspect script showed correct reads but printed garbage in console due to encoding.
+        # Assuming Data is in First Column.
+        df_target = pd.read_excel(file_path)
         
-        # 2. Traditional Sectors (Seibro '섹터' 탭 분류)
-        '반도체', # Seibro는 반도체를 '섹터'로 분류하는 경향이 있음 (단, AI반도체 등은 확인 필요하나 갯수 맞추기 위해 제외)
-                 # *TIGER 코리아TOP10은 테마로 분류됨 (TOP10은 제외 키워드 아님)
-        '은행', '증권', '보험', '건설', '철강', '운송', '기계', '자동차', '화학', '에너지', 
-        '미디어', '소프트웨어', '의료', '바이오', '헬스케어', '정보통신', '금융', '조선',
-        '경기소비재', '필수소비재', '유틸리티', '중공업', '여행', '레저',
+        # If headers are garbled, we might need to rely on index.  
+        # Let's assume Column 0 is Name.
+        target_names = df_target.iloc[:, 0].dropna().astype(str).str.strip().tolist()
         
-        # 3. Style/Strategy/Group (Seibro '스타일', '그룹주' 탭 분류)
-        '그룹', '배당', 'ESG', '리츠', '채권', '국채', '달러', '엔선물', '유가', '모멘텀', '밸류', 
-        '로우볼', '퀄리티', '우량주', '배당주', '가치주', '성장주', '액티브', 'KOFR', 'CD금리',
-        '달러선물', '엔화선물', '원자재', '농산물', '인프라'
-    ]
-    
-    for item in items:
-        name = item['itemname']
-        ticker = item['itemcode']
-        net_assets = int(item['marketSum'])
+        # [Step 2] Fetch FDR Master List for Ticker Mapping/Net Assets
+        df_master = fdr.StockListing('ETF/KR')
         
-        is_exclude = False
-        for k in exclude_keywords:
-            if k in name:
-                # [Exception] 'TOP10'은 Seibro 테마에 포함되는 경우가 많음 (예: TIGER 코리아TOP10)
-                # 따라서 이름에 TOP10이 있으면, 다른 제외 키워드('반도체' 등)가 있어도 일단 살려야 하나?
-                # 아니면 '반도체TOP10'은 섹터인가? -> Seibro 기준 '반도체'는 섹터.
-                # TIGER 코리아TOP10 (테마/우량주).
-                # 간단히: TOP10이 있으면 '우량주' 키워드 때문에 죽을 수 있으니 예외 처리
+        # Create Maps
+        name_to_row = {row['Name']: row for _, row in df_master.iterrows()}
+        
+        filtered_list = []
+        
+        for name in target_names:
+            if name in name_to_row:
+                row = name_to_row[name]
+                ticker = str(row['Symbol'])
                 
-                if 'TOP10' in name or 'Top10' in name:
-                     # TOP10이 포함된 경우, '반도체' 같은 섹터 키워드가 없으면 살림?
-                     # 일단 TOP10은 Keep.
-                     continue
-                     
-                is_exclude = True
-                break
+                # 'MarCap' might be missing in some naming conventions or newly listed
+                net_assets = row['MarCap'] if 'MarCap' in row else 0
+                
+                brand = name.split()[0].upper()
+                manager = BRAND_TO_MANAGER.get(brand, brand)
+                
+                filtered_list.append({
+                    'ticker': ticker,
+                    'name': name, # Use the official FDR name or Excel name? Excel name ensures match.
+                                  # But FDR name is safer for Ticker validity.
+                                  # They matched in the test, so they are identical.
+                    'theme': 'Selected Theme', 
+                    'net_assets': net_assets,
+                    'manager': manager
+                })
+            else:
+                print(f"Warning: ETF Name '{name}' from Excel not found in FDR listing.")
+                # If truly critical, we might try fuzzy matching here or skip.
+                # Since test showed 93/93 match, skipping logic is fine.
         
-        if not is_exclude:
-            brand = name.split()[0].upper()
-            manager = BRAND_TO_MANAGER.get(brand, brand)
-            
-            filtered_list.append({
-                'ticker': ticker,
-                'name': name,
-                'theme': 'Seibro Theme', 
-                'net_assets': net_assets,
-                'manager': manager
-            })
-            
-    # 정렬: 순자산 순
-    filtered_list.sort(key=lambda x: x['net_assets'], reverse=True)
-    
-    return filtered_list
+        # Sort by Net Assets
+        filtered_list.sort(key=lambda x: x['net_assets'], reverse=True)
+        
+        print(f"Loaded {len(filtered_list)} ETFs from {file_path}")
+        return filtered_list
+
+    except Exception as e:
+        print(f"Error loading Excel list: {e}")
+        return []
+
 
 # Alias for backward compatibility if needed
 fetch_latest_etf_list = update_etf_list_seibro_param
-
