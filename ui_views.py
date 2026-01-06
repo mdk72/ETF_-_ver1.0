@@ -20,10 +20,14 @@ from chart_utils import plot_candle_chart, render_market_breadth_chart
 # -----------------------------------------------------------------------------
 # 1. Momentum Ranking UI (Tab 1)
 # -----------------------------------------------------------------------------
-def render_momentum_ranking(rank_df, data_map):
+def render_momentum_ranking(rank_df, data_map, min_score=None):
     """모멘텀 랭킹 상세 화면 (메인 탭 1)"""
     col1, col2 = st.columns([4.8, 5.2])
     
+    # [Fix] 최소 점수 필터링
+    if min_score is not None:
+        rank_df = rank_df[rank_df['Score'] >= min_score]
+        
     # 1. 상단 섹션: 랭킹 테이블 & 캔들 차트
     selected_ticker = _render_ranking_table_section(col1, rank_df)
     _render_ranking_chart_section(col2, selected_ticker, rank_df, data_map)
@@ -40,7 +44,7 @@ def _render_ranking_table_section(col, rank_df):
     with col:
         st.markdown("### 모멘텀 랭킹")
         if rank_df.empty:
-            st.info("표시할 데이터가 없습니다.")
+            st.warning(f"조건을 만족하는 ETF가 없습니다.")
             return None
             
         display_df = rank_df[['ShortName', 'Close', 'Score', 'R_1w', 'R_1m', 'R_3m', 'Vol_20d']].copy()

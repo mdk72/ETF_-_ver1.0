@@ -123,11 +123,14 @@ def main():
     menu = st.sidebar.radio("메뉴 선택", ["현재 랭킹 분석", "시뮬레이션 (Backtest)", "현재 주도주 분석", "심층 분석 리포트", "고급 전략 (Advanced)", "개별 종목 분석"])
     st.sidebar.markdown("---")
     
+
     with st.sidebar.expander("가중치 설정 (Weights)"):
         w3m = st.slider("3개월 수익률", 0.0, 1.0, 0.5, step=0.1)
         w1m = st.slider("1개월 수익률", 0.0, 1.0, 0.3, step=0.1)
         w1w = st.slider("1주 수익률", 0.0, 1.0, 0.2, step=0.1)
-    
+        st.markdown("---")
+        min_score = st.slider("최소 모멘텀 점수 (Threshold)", -1.0, 3.0, 0.7, step=0.1)
+
     if st.sidebar.button("데이터 업데이트 (전체)", use_container_width=True):
         run_data_update()
         st.rerun()
@@ -159,7 +162,8 @@ def main():
 
     # 3. Content Routing
     if menu == "현재 랭킹 분석":
-        render_momentum_ranking(calculate_momentum_score(data_map), data_map)
+        # [Fix] 최소 모멘텀 점수 필터 적용
+        render_momentum_ranking(calculate_momentum_score(data_map, w3m=w3m, w1m=w1m, w1w=w1w), data_map, min_score=min_score)
 
     elif menu == "시뮬레이션 (Backtest)":
         render_backtest_ui(calculate_momentum_score(data_map), data_map)
