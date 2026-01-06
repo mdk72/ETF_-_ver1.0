@@ -49,7 +49,7 @@ def add_momentum_columns(df):
         print(f"Error in add_momentum_columns: {e}")
     return df
 
-def calculate_momentum_score(data_dict, ref_date=None):
+def calculate_momentum_score(data_dict, ref_date=None, w3m=0.5, w1m=0.3, w1w=0.2):
     """지정된 기준일(ref_date) 시점의 전 종목 모멘텀 점수를 한 번에 산출합니다."""
     metrics = []
     target_dt = pd.Timestamp(ref_date) if ref_date else None
@@ -74,20 +74,31 @@ def calculate_momentum_score(data_dict, ref_date=None):
             curr_price = row.get('Close', 0)
             ma_20 = row.get('MA_20', 0)
             
+            # [Fix] 동적 가중치 적용 재계산
+            # 기존에 add_momentum_columns에서 기본값(0.5/0.3/0.2)로 계산된 'MomentumScore'가 있지만,
+            # 사용자가 슬라이더로 조정한 경우를 반영하기 위해 여기서 다시 계산합니다.
+            r_3m = row.get('R_3m', 0)
+            r_1m = row.get('R_1m', 0)
+            r_1w = row.get('R_1w', 0)
+            vol = row.get('Vol_20d', 0.001)
+            if vol == 0: vol = 0.001
+            
+            score = (r_3m * w3m + r_1m * w1m + r_1w * w1w) / vol
+            
             metrics.append({
                 'Ticker': ticker,
                 'Name': row.get('Name', ticker),
-                'Score': row.get('MomentumScore', 0),
+                'Score': score, # Recalculated score
                 'Trend': 'Pass' if curr_price >= ma_20 > 0 else 'Fail',
                 'Manager': ETF_UNIVERSE.get(ticker, {}).get('manager', 'Unknown'),
                 'Theme': ETF_UNIVERSE.get(ticker, {}).get('theme', '자산배분'),
                 'ShortName': row.get('Name', ticker),
                 'Price': curr_price,
                 'Close': curr_price,
-                'R_1w': row.get('R_1w', 0),
-                'R_1m': row.get('R_1m', 0),
-                'R_3m': row.get('R_3m', 0),
-                'Vol_20d': row.get('Vol_20d', 0),
+                'R_1w': r_1w,
+                'R_1m': r_1m,
+                'R_3m': r_3m,
+                'Vol_20d': vol,
                 'MA_20': ma_20
             })
         except Exception:
