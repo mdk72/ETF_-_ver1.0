@@ -149,7 +149,22 @@ def main():
         is_bull, k_now, k_ma60 = check_market_defense(data_map)
         status_color, status_text = ("green", "Bull (상승장)") if is_bull else ("red", "Bear (하락장)")
         
+        # [NEW] 데이터 기준일 확인
+        last_date_str = "N/A"
+        if data_map:
+            # KOSDAQ 혹은 첫 번째 데이터의 마지막 날짜 확인
+            sample_df = data_map.get('KOSDAQ')
+            if sample_df is None or sample_df.empty:
+                # KOSDAQ 없으면 아무거나
+                if len(data_map) > 0:
+                    sample_df = next(iter(data_map.values()))
+            
+            if sample_df is not None and not sample_df.empty:
+                last_dt = sample_df.index[-1]
+                last_date_str = last_dt.strftime('%Y-%m-%d')
+
         st.sidebar.markdown("### Market Status")
+        st.sidebar.caption(f"Data Date: {last_date_str}")
         st.sidebar.markdown(f"KOSDAQ: <span style='color:{status_color}; font-weight:bold'>{status_text}</span>", unsafe_allow_html=True)
         st.sidebar.caption(f"{k_now:,.0f} / MA60: {k_ma60:,.0f}")
         st.sidebar.markdown("---")
