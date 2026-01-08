@@ -1,11 +1,7 @@
 {
   "manager": [
-    "KIWOOM",
-    "RISE",
     "미래에셋자산운용",
-    "삼성자산운용",
-    "신한자산운용",
-    "한국투자신탁운용"
+    "삼성자산운용"
   ],
   "min_score": 0.7,
   "exclude_risky": true,

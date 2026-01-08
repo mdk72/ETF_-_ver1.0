@@ -40,7 +40,12 @@ def render_momentum_ranking(rank_df, data_map, min_score=None):
 
             saved_manager = config.get('rank_manager', ["전체"])
             def_man = [saved_manager] if isinstance(saved_manager, str) else saved_manager
-            sel_manager = st.multiselect("운용사 필터", all_managers, default=def_man, key="rank_man", on_change=on_config_change)
+            
+            # [Fix] Streamlit API Exception prevent: Ensure default values are in options
+            valid_defaults = [m for m in def_man if m in all_managers]
+            if not valid_defaults: valid_defaults = ["전체"]
+            
+            sel_manager = st.multiselect("운용사 필터", all_managers, default=valid_defaults, key="rank_man", on_change=on_config_change)
             if not sel_manager or "전체" in sel_manager: sel_manager = "전체"
             
     # Apply Manager Filter
