@@ -206,7 +206,7 @@ def main():
         render_overlapping_report(calculate_momentum_score(data_map), data_map)
         
     elif menu == "고급 전략 (Advanced)":
-        render_advanced_backtest_ui()
+        render_advanced_backtest_ui(data_map)
         
     elif menu == "심층 분석 리포트":
         render_deep_report_board(data_map)

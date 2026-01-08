@@ -396,7 +396,17 @@ def run_advanced_simulation(params):
     
     try:
         # A. Prepare ETF Data (Universe)
-        target_etf_tickers = [t for t, info in ETF_UNIVERSE.items() if info['manager'] in sel_managers]
+        # [Fix] Filter by Universe (Theme/Sector) if provided
+        universe_tickers = params.get('universe_tickers')
+        
+        target_etf_tickers = []
+        for t, info in ETF_UNIVERSE.items():
+            # 1. Category Filter
+            if universe_tickers and t not in universe_tickers:
+                continue
+            # 2. Manager Filter
+            if info['manager'] in sel_managers:
+                target_etf_tickers.append(t)
         
         status_text.text(f"1. 대상 ETF 데이터 로딩 중... ({len(target_etf_tickers)}개)")
         

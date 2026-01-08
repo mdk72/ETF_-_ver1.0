@@ -495,7 +495,7 @@ def _render_report_results():
 # -----------------------------------------------------------------------------
 # 4. Advanced Simulation UI (Tab 4)
 # -----------------------------------------------------------------------------
-def render_advanced_backtest_ui():
+def render_advanced_backtest_ui(data_map=None):
     st.markdown("### 고급 전략 시뮬레이션")
     config = load_user_config()
     
@@ -524,7 +524,8 @@ def render_advanced_backtest_ui():
         params = {
             'start_date': s_date, 'end_date': e_date, 'sel_managers': sel_man,
             'etf_min_score': min_score, 'etf_ma_period': etf_ma, 'stock_ma_period': stk_ma,
-            'overlap_threshold': overlap, 'initial_capital': cap, 'per_trade_amt': amt
+            'overlap_threshold': overlap, 'initial_capital': cap, 'per_trade_amt': amt,
+            'universe_tickers': list(data_map.keys()) if data_map else None 
         }
         with st.spinner("Processing..."):
             res = run_advanced_simulation(params)
