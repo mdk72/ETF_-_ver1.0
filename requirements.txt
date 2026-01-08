@@ -6,3 +6,4 @@ matplotlib
 numpy
 requests
 beautifulsoup4
+openpyxl
