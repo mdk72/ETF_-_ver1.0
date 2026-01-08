@@ -49,7 +49,7 @@ def render_momentum_ranking(rank_df, data_map, min_score=None):
             if not sel_manager or "전체" in sel_manager: sel_manager = "전체"
             
     # Apply Manager Filter
-    if sel_manager != "전체":
+    if sel_manager != "전체" and not rank_df.empty:
         # Get list of allowed managers
         target_managers = set(sel_manager)
         # Filter rank_df
@@ -59,7 +59,7 @@ def render_momentum_ranking(rank_df, data_map, min_score=None):
         rank_df = rank_df[rank_df['Ticker'].map(ticker_to_man).isin(target_managers)]
 
     # [Fix] 최소 점수 필터링
-    if min_score is not None:
+    if min_score is not None and not rank_df.empty:
         rank_df = rank_df[rank_df['Score'] >= min_score]
         
     # 1. 상단 섹션: 랭킹 테이블 & 캔들 차트
