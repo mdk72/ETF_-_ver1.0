@@ -17,7 +17,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-from utils_config import load_user_config, ETF_UNIVERSE, on_config_change
+from utils_config import load_user_config, ETF_UNIVERSE, on_config_change, load_etf_universe
 from data_manager import fetch_market_data, run_data_update
 from analysis_engine import calculate_momentum_score, check_market_defense
 from ui_views import (
@@ -116,13 +116,27 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 def main():
+    # [Fix] Reload Universe on every rerun explicitly to update cached references
+    from utils_config import update_etf_universe
+    update_etf_universe()
+    
     # 1. Sidebar - Navigation & Global Controls
     st.sidebar.markdown("### ETF Strategy")
     st.sidebar.caption("Momentum & Overlap Analysis")
     
     menu = st.sidebar.radio("메뉴 선택", ["현재 랭킹 분석", "시뮬레이션 (Backtest)", "현재 주도주 분석", "심층 분석 리포트", "고급 전략 (Advanced)", "개별 종목 분석"])
     st.sidebar.markdown("---")
+
+    # [Category Toggle]
+    st.sidebar.markdown("### 분석 대상 (Universe)")
+    category_mode = st.sidebar.radio("Category", ["테마 (Theme)", "섹터 (Sector)"], label_visibility="collapsed")
+    target_category = 'Theme' if '테마' in category_mode else 'Sector'
     
+    # Filter Universe
+    if ETF_UNIVERSE:
+        filtered_universe = {k: v for k, v in ETF_UNIVERSE.items() if v.get('category', 'Theme') == target_category}
+    else:
+        filtered_universe = {}
 
     with st.sidebar.expander("가중치 설정 (Weights)"):
         w3m = st.slider("3개월 수익률", 0.0, 1.0, 0.5, step=0.1)
@@ -140,7 +154,12 @@ def main():
     # 2. Shared Data Loading (Only for relevant tabs)
     data_map = {}
     if menu != "개별 종목 분석":
-        data_map = fetch_market_data()
+        # Fetch data only for filtered universe
+        # fetch_market_data generally fetches everything in DB or cached. 
+        # We need to filter the returned map to match the category.
+        full_data_map = fetch_market_data()
+        data_map = {k: v for k, v in full_data_map.items() if k in filtered_universe or k == 'KOSDAQ'}
+        
         if not data_map:
             st.error("보유한 ETF 데이터가 없습니다. 업데이트 버튼을 눌러주세요.")
             return
@@ -171,7 +190,7 @@ def main():
 
     # Sidebar Links
     st.sidebar.markdown("### ETF 자료실")
-    st.sidebar.markdown("- [네이버 증권 ETF](https://finance.naver.com/sise/etf.naver)\n- [SEIBRO ETF](https://seibro.or.kr/websquare/control.jsp?w2xPath=/IP_D_601.xml)\n- [ETF CHECK](https://www.etfcheck.co.kr/)")
+    st.sidebar.markdown("- [네이버 증권 ETF](https://finance.naver.com/sise/etf.naver)\n- [SEIBRO ETF](https://seibro.or.kr/websquare/control.jsp?w2xPath=/IPORTAL/user/index.xml)\n- [ETF CHECK](https://www.etfcheck.co.kr/)")
     st.sidebar.markdown("---")
     st.sidebar.text("Ver 2.5 (Clean Optimized)")
 

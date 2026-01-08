@@ -9,9 +9,9 @@
   ],
   "min_score": 0.7,
   "exclude_risky": true,
-  "bt_h_start_str": "2025-12-08",
-  "bt_h_end_str": "2026-01-06",
-  "bt_date_str": "2026-01-06",
+  "bt_h_start_str": "2026-01-01",
+  "bt_h_end_str": "2026-01-08",
+  "bt_date_str": "2026-01-08",
   "bt_top_n": 20,
   "adv_manager": [
     "KIWOOM",
@@ -40,5 +40,9 @@
   "curr_score": 0.7,
   "curr_risk": true,
   "curr_top_n": 20,
-  "top_n_etf": 20
+  "top_n_etf": 20,
+  "rank_manager": [
+    "삼성자산운용",
+    "미래에셋자산운용"
+  ]
 }

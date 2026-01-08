@@ -14,6 +14,12 @@ def load_etf_universe():
 # Global Data Instances (초기 로딩용)
 ETF_UNIVERSE = load_etf_universe()
 
+def update_etf_universe():
+    """DB에서 최신 데이터를 읽어와 전역 변수 ETF_UNIVERSE를 In-Place 업데이트합니다."""
+    new_data = load_etf_universe()
+    ETF_UNIVERSE.clear()
+    ETF_UNIVERSE.update(new_data)
+
 # -----------------------------------------------------------------------------
 # User Config Management
 # -----------------------------------------------------------------------------
@@ -42,6 +48,7 @@ def on_config_change():
     mapping = {
         'bt_man': 'manager', 'bt_score': 'min_score', 'bt_risk': 'exclude_risky', 'bt_top_n': 'top_n_etf',
         'curr_man': 'curr_manager', 'curr_score': 'curr_score', 'curr_risk': 'curr_risk', 'curr_top_n': 'curr_top_n',
+        'rank_man': 'rank_manager',
         'adv_man': 'adv_manager', 'adv_score': 'adv_min_score', 'adv_overlap': 'adv_overlap',
         'adv_ma_etf': 'adv_ma_etf', 'adv_ma_stock': 'adv_ma_stock', 'adv_cap': 'adv_cap', 'adv_amt': 'adv_amt'
     }

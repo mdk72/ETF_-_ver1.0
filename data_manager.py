@@ -20,13 +20,24 @@ def get_stock_data_cached(ticker, start_date, end_date):
     """개별 종목 데이터를 최적화하여 조회하고 인덱스를 표준화합니다."""
     for attempt in range(2): # 2번 시도
         try:
-            df = fdr.DataReader(ticker, start_date, end_date)
+            df = pd.DataFrame()
+            try:
+                df = fdr.DataReader(ticker, start_date, end_date)
+            except: pass
+
+            if df.empty:
+                try: df = fdr.DataReader(f"{ticker}.KS", start_date, end_date)
+                except: pass
+            
             if not df.empty:
                 # 인덱스 표준화 (Date)
                 if df.index.name != 'Date':
                     df.index.name = 'Date'
                 return df
-            break
+            
+            # 여기서 에러 없이 루프 돌면서 재시도 (또는 sleep)
+            time.sleep(0.5)
+            continue
         except Exception:
             time.sleep(0.5)
             continue
@@ -59,8 +70,12 @@ def fetch_market_data(days=2500):
         
         for attempt in range(2): # 간이 리트라이
             try:
-                df = fdr.DataReader(ticker, start_date, end_date)
-                # 데이터가 너무 적으면 KOSPI 접미사 시도
+                df = pd.DataFrame()
+                try:
+                    df = fdr.DataReader(ticker, start_date, end_date)
+                except: pass
+                
+                # 데이터가 없거나 너무 적으면 KOSPI 접미사 시도
                 if df.empty or len(df) < 10:
                     try: df = fdr.DataReader(f"{ticker}.KS", start_date, end_date)
                     except: pass
@@ -75,7 +90,9 @@ def fetch_market_data(days=2500):
                     df = add_momentum_columns(df)
                     df['Name'] = ETF_UNIVERSE.get(ticker, {}).get('name', 'Unknown')
                     return ticker, df
-                break
+                
+                # 실패 시
+                time.sleep(0.2)
             except:
                 time.sleep(0.2)
         return ticker, None
@@ -111,7 +128,7 @@ def fetch_market_data(days=2500):
     return data_dict
 
 def run_data_update():
-    """전체 데이터 최신화 (목록 갱신 -> 보유종목 DB 업데이트)"""
+    """전체 데이터 최신화 (목록 갱신 -> 보유종목 DB 업데이트) - Parallelized"""
     status_cont = st.empty()
     prog_bar = st.progress(0)
     
@@ -122,39 +139,44 @@ def run_data_update():
     # DB에 유니버스 정보 저장
     save_etf_universe(new_universe_list)
     
-    # 2. 보유종목 업데이트 (스마트 업데이트)
-    status_cont.info("📦 ETF 보유 종목 정보 DB 업데이트 중...")
+    # 2. 보유종목 업데이트 (스마트 업데이트 - 병렬 처리)
+    status_cont.info("📦 ETF 보유 종목 정보 DB 업데이트 중... (Parallel)")
     
     today_str = datetime.now().strftime('%Y-%m-%d')
     total = len(new_universe_list)
     updated_count = 0
     skipped_count = 0
+    completed = 0
     
-    for i, etf in enumerate(new_universe_list):
-        prog_bar.progress((i+1)/total)
-        ticker = etf['ticker']
-        name = etf['name']
-        
-        # 성분 로드 (DB에서 확인)
-        existing_holdings = get_etf_holdings(ticker)
-        if existing_holdings:
-            # db_manager는 updated_at을 테이블에 저장하므로, 
-            # 개별 조회가 가능하나 여기서는 효율을 위해 로직 단순화
-            # (오늘 이미 업데이트했다면 스킵)
-            pass 
+    # 병렬 처리를 위한 작업 함수
+    def process_etf(etf_info):
+        t_ticker = etf_info['ticker']
+        t_name = etf_info['name']
+        try:
+            holdings = fetch_etf_holdings(t_ticker)
+            return t_ticker, t_name, holdings
+        except:
+            return t_ticker, t_name, []
 
-        status_cont.text(f"[{i+1}/{total}] {name} 업데이트 중...")
-        holdings = fetch_etf_holdings(ticker)
+    # ThreadPool로 병렬 실행
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        future_to_etf = {executor.submit(process_etf, etf): etf for etf in new_universe_list}
         
-        if holdings:
-            save_etf_holdings(ticker, holdings)
-            updated_count += 1
-        else:
-            skipped_count += 1
+        for future in concurrent.futures.as_completed(future_to_etf):
+            completed += 1
+            ticker, name, holdings = future.result()
             
-        time.sleep(0.1)
-        
+            if holdings:
+                save_etf_holdings(ticker, holdings)
+                updated_count += 1
+                status_cont.text(f"[{completed}/{total}] {name} 업데이트 완료 ({len(holdings)}종목)")
+            else:
+                skipped_count += 1
+                status_cont.text(f"[{completed}/{total}] {name} 데이터 없음/실패")
+            
+            prog_bar.progress(completed / total)
+
     status_cont.success(f"✅ DB 업데이트 완료! (갱신: {updated_count}, 실패/기존: {skipped_count})")
     st.cache_data.clear()
-    time.sleep(2)
+    time.sleep(1)
     st.rerun()

@@ -48,6 +48,7 @@ def backup_data_files():
 def update_etf_list_seibro_param():
     """
     etf_list.xlsx 파일에서 종목명을 읽어와 FDR 마스터 정보와 매핑하여 반환합니다.
+    '테마etf_list' 시트는 'Theme', '섹터etf_list' 시트는 'Sector' 카테고리로 분류합니다.
     """
     import pandas as pd
     import FinanceDataReader as fdr
@@ -60,55 +61,57 @@ def update_etf_list_seibro_param():
         return []
         
     try:
-        # [Step 1] Read Excel
-        # Header issue in testing: columns might be garbage unicode if file has weird encoding.
-        # But pandas usually handles xlsx well. 
-        # Inspect script showed correct reads but printed garbage in console due to encoding.
-        # Assuming Data is in First Column.
-        df_target = pd.read_excel(file_path)
+        # [Step 1] Read Excel Sheets
+        xls = pd.ExcelFile(file_path)
+        all_etfs = []
         
-        # If headers are garbled, we might need to rely on index.  
-        # Let's assume Column 0 is Name.
-        target_names = df_target.iloc[:, 0].dropna().astype(str).str.strip().tolist()
-        
-        # [Step 2] Fetch FDR Master List for Ticker Mapping/Net Assets
+        # FDR Master List for Ticker Mapping
         df_master = fdr.StockListing('ETF/KR')
-        
-        # Create Maps
         name_to_row = {row['Name']: row for _, row in df_master.iterrows()}
         
-        filtered_list = []
+        # Define sheets and their categories mapping
+        # Try to find sheets that close match the user provided names
+        sheet_map = {}
+        for sheet in xls.sheet_names:
+            if '테마' in sheet: sheet_map[sheet] = 'Theme'
+            elif '섹터' in sheet: sheet_map[sheet] = 'Sector'
+            else: print(f"Skipping unknown sheet: {sheet}")
         
-        for name in target_names:
-            if name in name_to_row:
-                row = name_to_row[name]
-                ticker = str(row['Symbol'])
-                
-                # 'MarCap' might be missing in some naming conventions or newly listed
-                net_assets = row['MarCap'] if 'MarCap' in row else 0
-                
-                brand = name.split()[0].upper()
-                manager = BRAND_TO_MANAGER.get(brand, brand)
-                
-                filtered_list.append({
-                    'ticker': ticker,
-                    'name': name, # Use the official FDR name or Excel name? Excel name ensures match.
-                                  # But FDR name is safer for Ticker validity.
-                                  # They matched in the test, so they are identical.
-                    'theme': 'Selected Theme', 
-                    'net_assets': net_assets,
-                    'manager': manager
-                })
-            else:
-                print(f"Warning: ETF Name '{name}' from Excel not found in FDR listing.")
-                # If truly critical, we might try fuzzy matching here or skip.
-                # Since test showed 93/93 match, skipping logic is fine.
+        if not sheet_map:
+            # Fallback for legacy format (one sheet or different names)
+            print("Warning: Could not identify Theme/Sector sheets. Treating first sheet as Theme.")
+            sheet_map[xls.sheet_names[0]] = 'Theme'
+
+        print(f"Found sheets: {sheet_map}")
+
+        for sheet_name, category in sheet_map.items():
+            df_target = pd.read_excel(xls, sheet_name=sheet_name)
+            target_names = df_target.iloc[:, 0].dropna().astype(str).str.strip().tolist()
+            
+            for name in target_names:
+                if name in name_to_row:
+                    row = name_to_row[name]
+                    ticker = str(row['Symbol'])
+                    net_assets = row['MarCap'] if 'MarCap' in row else 0
+                    brand = name.split()[0].upper()
+                    manager = BRAND_TO_MANAGER.get(brand, brand)
+                    
+                    all_etfs.append({
+                        'ticker': ticker,
+                        'name': name,
+                        'theme': 'Selected Theme' if category == 'Theme' else 'Selected Sector', 
+                        'net_assets': net_assets,
+                        'manager': manager,
+                        'category': category
+                    })
+                else:
+                    print(f"Warning: ETF Name '{name}' (Sheet: {sheet_name}) not found in FDR listing.")
         
         # Sort by Net Assets
-        filtered_list.sort(key=lambda x: x['net_assets'], reverse=True)
+        all_etfs.sort(key=lambda x: x['net_assets'], reverse=True)
         
-        print(f"Loaded {len(filtered_list)} ETFs from {file_path}")
-        return filtered_list
+        print(f"Loaded {len(all_etfs)} ETFs from {file_path}")
+        return all_etfs
 
     except Exception as e:
         print(f"Error loading Excel list: {e}")

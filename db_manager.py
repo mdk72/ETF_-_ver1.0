@@ -22,9 +22,17 @@ def init_db():
                 theme TEXT,
                 manager TEXT,
                 net_assets INTEGER,
+                category TEXT,
                 updated_at TEXT
             )
         ''')
+        
+        # [Migration] 'category' 컬럼 추가 (Schema Evolution)
+        try:
+            cursor.execute("ALTER TABLE etf_universe ADD COLUMN category TEXT")
+        except:
+            pass 
+
         
         # ETF 구성 종목 테이블
         cursor.execute('''
@@ -70,14 +78,15 @@ def save_etf_universe(data_list):
         
         for item in data_list:
             cursor.execute('''
-                INSERT OR REPLACE INTO etf_universe (ticker, name, theme, manager, net_assets, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO etf_universe (ticker, name, theme, manager, net_assets, category, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (
                 item['ticker'], 
                 item['name'], 
                 item.get('type', item.get('theme', 'Unknown')), 
                 item.get('manager', 'Unknown'), 
                 item.get('net_assets', 0),
+                item.get('category', 'Theme'),
                 now
             ))
         conn.commit()
@@ -118,7 +127,9 @@ def get_all_etfs():
                     'name': row['name'],
                     'theme': row['theme'],
                     'manager': row['manager'],
+                    'manager': row['manager'],
                     'net_assets': row['net_assets'],
+                    'category': row['category'],
                     'desc': f"{row['manager']} | {row['net_assets']}억"
                 }
             return universe

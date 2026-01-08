@@ -64,8 +64,33 @@ def fetch_etf_holdings(ticker):
             pct = row[pct_col]
             pct_str = str(pct) if not pd.isna(pct) else ""
             
+            # Manual Map for recent listings or special cases
+            MANUAL_TICKER_MAP = {
+                '삼성에피스홀딩스': '0126Z0'
+            }
+            
             # Get ticker from map
             stock_ticker = ticker_map.get(name_str, None)
+            
+            # [Fallback 1] Manual Map
+            if not stock_ticker:
+                stock_ticker = MANUAL_TICKER_MAP.get(name_str, None)
+            
+            # [Fallback] If ticker is None (e.g. regex failed), try FDR listing map
+            if not stock_ticker:
+                try:
+                    import FinanceDataReader as fdr
+                    # Memoization could be better, but for now let's use a simple static map if possible or fetch
+                    # To avoid fetching every time, let's assume we can fetch once per run or rely on DB
+                    # For minimal change, let's fetch KRX list if not cached in global
+                    if 'KRX_TICKER_MAP' not in globals():
+                        global KRX_TICKER_MAP
+                        df_krx = fdr.StockListing('KRX')
+                        KRX_TICKER_MAP = dict(zip(df_krx['Name'], df_krx['Code']))
+                    
+                    stock_ticker = KRX_TICKER_MAP.get(name_str, None)
+                except:
+                    pass
             
             holdings.append({
                 'name': name_str, 

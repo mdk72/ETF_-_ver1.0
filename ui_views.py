@@ -22,13 +22,43 @@ from chart_utils import plot_candle_chart, render_market_breadth_chart
 # -----------------------------------------------------------------------------
 def render_momentum_ranking(rank_df, data_map, min_score=None):
     """모멘텀 랭킹 상세 화면 (메인 탭 1)"""
-    col1, col2 = st.columns([4.8, 5.2])
-    
+    # [Fix] Manager Filter for Ranking View
+    config = load_user_config()
+    with st.expander("랭킹 필터 설정", expanded=False):
+        c1, c2 = st.columns([1, 1])
+        with c1:
+            # Filter managers based on current rank_df (which is already filtered by category)
+            if not rank_df.empty:
+                available_tickers = set(rank_df['Ticker'])
+                available_managers = sorted(list(set(
+                    ETF_UNIVERSE[t]['manager'] for t in available_tickers 
+                    if t in ETF_UNIVERSE and 'manager' in ETF_UNIVERSE[t]
+                )))
+                all_managers = ["전체"] + available_managers
+            else:
+                all_managers = ["전체"]
+
+            saved_manager = config.get('rank_manager', ["전체"])
+            def_man = [saved_manager] if isinstance(saved_manager, str) else saved_manager
+            sel_manager = st.multiselect("운용사 필터", all_managers, default=def_man, key="rank_man", on_change=on_config_change)
+            if not sel_manager or "전체" in sel_manager: sel_manager = "전체"
+            
+    # Apply Manager Filter
+    if sel_manager != "전체":
+        # Get list of allowed managers
+        target_managers = set(sel_manager)
+        # Filter rank_df
+        # We need to map Ticker -> Manager to filter
+        # optimization: create local map
+        ticker_to_man = {t: ETF_UNIVERSE[t]['manager'] for t in rank_df['Ticker'] if t in ETF_UNIVERSE}
+        rank_df = rank_df[rank_df['Ticker'].map(ticker_to_man).isin(target_managers)]
+
     # [Fix] 최소 점수 필터링
     if min_score is not None:
         rank_df = rank_df[rank_df['Score'] >= min_score]
         
     # 1. 상단 섹션: 랭킹 테이블 & 캔들 차트
+    col1, col2 = st.columns([4.8, 5.2])
     selected_ticker = _render_ranking_table_section(col1, rank_df)
     _render_ranking_chart_section(col2, selected_ticker, rank_df, data_map)
     
@@ -58,6 +88,7 @@ def _render_ranking_table_section(col, rank_df):
         event = st.dataframe(
             display_df, width="stretch", height=420,
             on_select="rerun", selection_mode="single-row", hide_index=False,
+            key="ranking_table",
             column_config={
                 "Name": st.column_config.TextColumn("이름", width="medium"),
                 "Price": st.column_config.TextColumn("현재가", width="small"),
@@ -111,14 +142,16 @@ def _render_holdings_table_section(col, ticker):
 
         # 성과 지표 포함 가공
         processed = []
-        end_date = datetime.now()
+        # [Fix] Date precision stability for caching & dataframe consistency
+        end_date = datetime.now().date()
         start_date = end_date - timedelta(days=130)
         
         for h in holdings:
             h_ticker = h['ticker']
             rets = {'ret_1w': 0, 'ret_1m': 0, 'ret_3m': 0}
             try:
-                df = get_stock_data_cached(h_ticker, start_date, end_date)
+                # Pass date objects or string to ensure stable cache keys
+                df = get_stock_data_cached(h_ticker, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
                 if not df.empty and len(df) > 10:
                     last_p = df['Close'].iloc[-1]
                     if len(df) >= 6: rets['ret_1w'] = (last_p / df['Close'].iloc[-6] - 1) * 100
@@ -134,6 +167,8 @@ def _render_holdings_table_section(col, ticker):
         h_event = st.dataframe(
             h_df, width="stretch", height=420, on_select="rerun", 
             selection_mode="single-row", hide_index=True,
+            # [Fix] Unique key per ETF to prevent state collisions, ensuring selection state persists for the active table
+            key=f"holdings_table_{ticker}",
             column_config={"name": st.column_config.TextColumn("종목명", width="medium"), "pct": st.column_config.TextColumn("비중", width="small")}
         )
         
@@ -170,7 +205,8 @@ def render_backtest_ui(current_rank_df, data_map):
     st.markdown("### 백테스트 (과거 시점 및 기간 분석)")
     
     config = load_user_config()
-    sel_manager, min_score, top_n_etf, exclude_risky = _render_backtest_settings_section(config)
+    config = load_user_config()
+    sel_manager, min_score, top_n_etf, exclude_risky = _render_backtest_settings_section(config, data_map)
     
     # 1. 히스토리 테이블 섹션
     target_date = _render_backtest_history_section(config, min_score, sel_manager, data_map, exclude_risky, top_n_etf)
@@ -181,13 +217,24 @@ def render_backtest_ui(current_rank_df, data_map):
     # 3. 시장 온도계 섹션
     _render_market_breadth_section()
 
-def _render_backtest_settings_section(config):
+def _render_backtest_settings_section(config, data_map):
     """백테스트 상단 필터 설정 영역"""
     with st.expander("분석 설정", expanded=False):
         st.markdown("---")
         c1, c2 = st.columns([1, 1])
         with c1:
-            all_managers = ["전체"] + sorted(list(set(info['manager'] for info in ETF_UNIVERSE.values())))
+            # [Fix] Filter managers based on current data_map (which is already filtered by category)
+            # data_map keys are tickers. We need to look up their manager in ETF_UNIVERSE
+            if data_map:
+                available_tickers = set(data_map.keys())
+                available_managers = sorted(list(set(
+                    ETF_UNIVERSE[t]['manager'] for t in available_tickers 
+                    if t in ETF_UNIVERSE and 'manager' in ETF_UNIVERSE[t]
+                )))
+                all_managers = ["전체"] + available_managers
+            else:
+                all_managers = ["전체"]
+
             saved_manager = config.get('manager', '전체')
             def_man = saved_manager if isinstance(saved_manager, list) else ([saved_manager] if saved_manager != "전체" else ["전체"])
             sel_manager = st.multiselect("운용사 필터", all_managers, default=def_man, key="bt_man", on_change=on_config_change)
@@ -235,19 +282,50 @@ def _render_backtest_detail_section(target_date, data_map, sel_manager, min_scor
     """특정 시점 클릭 또는 버튼 클릭 시 상세 분석 결과 렌더링"""
     st.markdown("### 특정 시점 상세 분석")
     if 'bt_date' not in st.session_state: st.session_state['bt_date'] = datetime.now().date()
+    
     if target_date and st.session_state['bt_date'] != target_date:
         st.session_state['bt_date'] = target_date
-        st.session_state['bt_run_detail'] = False 
+        st.session_state['bt_run_detail'] = True
+        st.session_state['bt_detail_cache'] = None 
+        st.session_state['bt_selected_stock'] = None
 
     col_d1, col_d2, col_d3 = st.columns([1, 1, 1])
-    with col_d1: ref_date = st.date_input("분석 시점", key="bt_date", on_change=on_config_change)
+    with col_d1: 
+        ref_date = st.date_input("분석 시점", key="bt_date_picker", value=st.session_state['bt_date'])
+        if ref_date != st.session_state['bt_date']:
+            st.session_state['bt_date'] = ref_date
+            st.session_state['bt_detail_cache'] = None
+            st.session_state['bt_selected_stock'] = None
+            st.rerun()
     with col_d3:
         st.markdown('<div style="margin-top: 28px;"></div>', unsafe_allow_html=True)
         if st.button("상세 분석 실행", key="bt_btn_detail", type="primary", width="stretch"):
             st.session_state['bt_run_detail'] = True
 
     if st.session_state.get('bt_run_detail', False):
-        top_list = get_top_etfs(ref_date, data_map, sel_manager, min_score, top_n_etf=top_n_etf, exclude_risky=exclude_risky)
+        if st.session_state.get('bt_detail_cache') is None:
+            top_list = get_top_etfs(st.session_state['bt_date'], data_map, sel_manager, min_score, top_n_etf=top_n_etf, exclude_risky=exclude_risky)
+            if not top_list:
+                st.warning("해당 시점에 조건에 맞는 ETF가 없습니다.")
+                st.session_state['bt_detail_cache'] = {'empty': True}
+                return
+
+            sel_tickers = [e['ticker'] for e in top_list]
+            overlap_list = analyze_overlapping_stocks_report(sel_tickers, top_n=10, ref_date=st.session_state['bt_date'])
+            
+            st.session_state['bt_detail_cache'] = {
+                'empty': False,
+                'top_list': top_list,
+                'overlap_list': overlap_list
+            }
+        
+        cache = st.session_state['bt_detail_cache']
+        if cache.get('empty'):
+            st.warning("조건에 맞는 ETF가 없습니다.")
+            return
+
+        top_list = cache['top_list']
+        overlap_list = cache['overlap_list']
         if not top_list:
             st.warning("해당 시점에 조건에 맞는 ETF가 없습니다.")
             return
@@ -257,28 +335,46 @@ def _render_backtest_detail_section(target_date, data_map, sel_manager, min_scor
         etf_df['Score'] = etf_df['momentum_score'].apply(lambda x: f"{x:.3f}")
         st.dataframe(etf_df[['ticker', 'name', 'manager', 'Score']], hide_index=True)
         
-        sel_tickers = [e['ticker'] for e in top_list]
-        overlap_list = analyze_overlapping_stocks_report(sel_tickers, top_n=10, ref_date=ref_date)
+
         if overlap_list:
             st.subheader("대표 주도주 (Top 10 Overlap)")
             ov_df = pd.DataFrame(overlap_list)
             cols = [c for c in ['순위', '종목명', '중복횟수', '중복비율(%)', '당시가', '수익률', '최고%', '최저%'] if c in ov_df.columns]
-            evt = st.dataframe(ov_df[cols], hide_index=True, width="stretch", on_select="rerun", selection_mode="single-row", key="bt_detail_ov_table", column_config={"중복횟수": st.column_config.NumberColumn("중복횟수", format="%d회")})
+            evt = st.dataframe(
+                ov_df[cols], 
+                hide_index=True, 
+                width="stretch", 
+                on_select="rerun", 
+                selection_mode="single-row", 
+                key="bt_detail_ov_table_v2", 
+                column_config={"중복횟수": st.column_config.NumberColumn("중복횟수", format="%d회")}
+            )
             
             if len(evt.selection.rows) > 0:
                 idx = evt.selection.rows[0]
-                _render_detail_stock_chart(ov_df.iloc[idx]['티커'], ov_df.iloc[idx]['종목명'], ref_date)
+                selected_row = ov_df.iloc[idx]
+                st.session_state['bt_selected_stock'] = {
+                    'ticker': selected_row['티커'],
+                    'name': selected_row['종목명']
+                }
+            
+            if st.session_state.get('bt_selected_stock'):
+                sel = st.session_state['bt_selected_stock']
+                _render_detail_stock_chart(sel['ticker'], sel['name'], st.session_state['bt_date'])
 
 def _render_detail_stock_chart(ticker, name, ref_date):
     """상세 분석 섹션 내의 개별 종목 차트 렌더링"""
     st.divider()
-    st.subheader(f"{name} 상세 차트")
+    st.markdown(f"#### 📈 {name} ({ticker}) 상세 차트")
     p_date = pd.Timestamp(ref_date)
     sdf = get_stock_data_cached(ticker, p_date - timedelta(days=180), datetime.now())
     if not sdf.empty:
         sdf = add_momentum_columns(sdf)
         fig = plot_candle_chart(sdf, ticker, name, ref_date=p_date)
-        st.plotly_chart(fig, use_container_width=True)
+        fig.update_layout(height=500, margin=dict(t=30, b=20, l=10, r=10))
+        st.plotly_chart(fig, use_container_width=True, key=f"bt_chart_{ticker}_{ref_date}")
+    else:
+        st.error(f"{name} 데이터를 불러올 수 없습니다.")
 
 def _render_market_breadth_section():
     """시장 활성도(온도계) 차트 섹션 렌더링"""
@@ -303,7 +399,8 @@ def render_overlapping_report(current_rank_df, data_map):
     config = load_user_config()
     
     # 1. 필터 설정 섹션
-    sel_manager, min_score, top_n, exclude_risky = _render_report_filters(config)
+    # 1. 필터 설정 섹션
+    sel_manager, min_score, top_n, exclude_risky = _render_report_filters(config, data_map)
     
     # 2. 분석 실행 버튼 및 로직
     if st.button("분석 실행", type="primary", key="curr_btn_run"):
@@ -312,16 +409,22 @@ def render_overlapping_report(current_rank_df, data_map):
     # 3. 결과 렌더링 섹션
     _render_report_results()
 
-def _render_report_filters(config):
+def _render_report_filters(config, data_map):
     """보고서 탭의 상단 필터 설정"""
     with st.expander("필터 설정", expanded=False):
         c1, c2 = st.columns([1, 1])
         with c1:
-            all_managers = ["전체"] + sorted(list(set(info['manager'] for info in ETF_UNIVERSE.values())))
+            if data_map:
+                available_tickers = set(data_map.keys())
+                available_managers = sorted(list(set(
+                    ETF_UNIVERSE[t]['manager'] for t in available_tickers 
+                    if t in ETF_UNIVERSE and 'manager' in ETF_UNIVERSE[t]
+                )))
+                all_managers = ["전체"] + available_managers
+            else:
+                all_managers = ["전체"]
+                
             saved_manager = config.get('curr_manager', ["전체"])
-            def_man = [saved_manager] if isinstance(saved_manager, str) else saved_manager
-            sel_manager = st.multiselect("운용사", all_managers, default=def_man, key="curr_man", on_change=on_config_change)
-            if not sel_manager or "전체" in sel_manager: sel_manager = "전체"
         with c2:
             min_score = st.slider("최소 점수", 0.0, 3.0, config.get('curr_score', 0.5), 0.1, key="curr_score", on_change=on_config_change)
             top_n = st.number_input("Top N", 1, 30, config.get('curr_top_n', 5), key="curr_top_n", on_change=on_config_change)
