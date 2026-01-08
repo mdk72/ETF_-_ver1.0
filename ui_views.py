@@ -288,20 +288,25 @@ def _render_backtest_detail_section(target_date, data_map, sel_manager, min_scor
     st.markdown("### 특정 시점 상세 분석")
     if 'bt_date' not in st.session_state: st.session_state['bt_date'] = datetime.now().date()
     
+    # [Fix] Date Picker Callback to prevent Rerun Loop
+    def on_date_change():
+        st.session_state['bt_date'] = st.session_state['bt_date_picker']
+        st.session_state['bt_detail_cache'] = None
+        st.session_state['bt_selected_stock'] = None
+
     if target_date and st.session_state['bt_date'] != target_date:
         st.session_state['bt_date'] = target_date
+        # Sync widget state directly
+        st.session_state['bt_date_picker'] = target_date
         st.session_state['bt_run_detail'] = True
         st.session_state['bt_detail_cache'] = None 
         st.session_state['bt_selected_stock'] = None
 
     col_d1, col_d2, col_d3 = st.columns([1, 1, 1])
     with col_d1: 
-        ref_date = st.date_input("분석 시점", key="bt_date_picker", value=st.session_state['bt_date'])
-        if ref_date != st.session_state['bt_date']:
-            st.session_state['bt_date'] = ref_date
-            st.session_state['bt_detail_cache'] = None
-            st.session_state['bt_selected_stock'] = None
-            st.rerun()
+        # Remove manual rerun logic, use callback
+        st.date_input("분석 시점", key="bt_date_picker", value=st.session_state['bt_date'], on_change=on_date_change)
+
     with col_d3:
         st.markdown('<div style="margin-top: 28px;"></div>', unsafe_allow_html=True)
         if st.button("상세 분석 실행", key="bt_btn_detail", type="primary", width="stretch"):
@@ -335,7 +340,7 @@ def _render_backtest_detail_section(target_date, data_map, sel_manager, min_scor
             st.warning("해당 시점에 조건에 맞는 ETF가 없습니다.")
             return
 
-        st.subheader(f"{ref_date} 선정 ETF ({len(top_list)}개)")
+        st.subheader(f"{st.session_state['bt_date']} 선정 ETF ({len(top_list)}개)")
         etf_df = pd.DataFrame(top_list)
         etf_df['Score'] = etf_df['momentum_score'].apply(lambda x: f"{x:.3f}")
         st.dataframe(etf_df[['ticker', 'name', 'manager', 'Score']], hide_index=True)
