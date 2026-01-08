@@ -435,6 +435,14 @@ def _render_report_filters(config, data_map):
                 all_managers = ["전체"]
                 
             saved_manager = config.get('curr_manager', ["전체"])
+            def_man = [saved_manager] if isinstance(saved_manager, str) else saved_manager
+            
+            # [Fix] Streamlit API Exception prevent
+            valid_defaults = [m for m in def_man if m in all_managers]
+            if not valid_defaults: valid_defaults = ["전체"]
+
+            sel_manager = st.multiselect("운용사 필터", all_managers, default=valid_defaults, key="curr_manager", on_change=on_config_change)
+            if not sel_manager or "전체" in sel_manager: sel_manager = "전체"
         with c2:
             min_score = st.slider("최소 점수", 0.0, 3.0, config.get('curr_score', 0.5), 0.1, key="curr_score", on_change=on_config_change)
             top_n = st.number_input("Top N", 1, 30, config.get('curr_top_n', 5), key="curr_top_n", on_change=on_config_change)
