@@ -10,19 +10,15 @@
   "bt_date_str": "2026-01-08",
   "bt_top_n": 20,
   "adv_manager": [
-    "KIWOOM",
-    "RISE",
     "미래에셋자산운용",
-    "삼성자산운용",
-    "한국투자신탁운용",
-    "신한자산운용"
+    "삼성자산운용"
   ],
-  "adv_start_str": "2025-01-01",
-  "adv_end_str": "2026-01-02",
+  "adv_start_str": "2022-01-01",
+  "adv_end_str": "2022-12-31",
   "adv_etf_score": 0.7,
   "adv_etf_ma": 20,
   "adv_stock_ma": 60,
-  "adv_overlap": 3,
+  "adv_overlap": 2,
   "adv_cap": 100000000,
   "adv_amt": 5000000,
   "curr_manager": [
@@ -40,5 +36,8 @@
   "rank_manager": [
     "삼성자산운용",
     "미래에셋자산운용"
-  ]
+  ],
+  "adv_min_score": 0.7,
+  "adv_ma_etf": 20,
+  "adv_ma_stock": 20
 }

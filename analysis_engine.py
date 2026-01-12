@@ -23,12 +23,12 @@ def add_momentum_columns(df):
     try:
         # Close 가격 기반 수익률 계산 (벡터 연산 활용)
         close = df['Close']
-        r_1w = close.pct_change(5)
-        r_1m = close.pct_change(20)
-        r_3m = close.pct_change(60)
+        r_1w = close.pct_change(5, fill_method=None)
+        r_1m = close.pct_change(20, fill_method=None)
+        r_3m = close.pct_change(60, fill_method=None)
         
         # 20일 이동 변동성 (연화)
-        vol_20d = close.pct_change().rolling(20).std() * np.sqrt(252)
+        vol_20d = close.pct_change(fill_method=None).rolling(20).std() * np.sqrt(252)
         # 변동성 0 방지 및 결측치 처리
         vol_20d = vol_20d.replace(0, 0.001).fillna(0.001)
         
@@ -432,10 +432,10 @@ def run_advanced_simulation(params):
                 # Pre-calc Indicators
                 df['MA_Filter'] = df['Close'].rolling(params['etf_ma_period']).mean()
                 
-                df['R_1W'] = df['Close'].pct_change(5)
-                df['R_1M'] = df['Close'].pct_change(20)
-                df['R_3M'] = df['Close'].pct_change(60)
-                vol = df['Close'].pct_change().rolling(20).std() * np.sqrt(252)
+                df['R_1W'] = df['Close'].pct_change(5, fill_method=None)
+                df['R_1M'] = df['Close'].pct_change(20, fill_method=None)
+                df['R_3M'] = df['Close'].pct_change(60, fill_method=None)
+                vol = df['Close'].pct_change(fill_method=None).rolling(20).std() * np.sqrt(252)
                 df['Vol'] = vol.replace(0, 0.01).fillna(0.01)
                 
                 df['Score'] = (df['R_3M'] * 0.5 + df['R_1M'] * 0.3 + df['R_1W'] * 0.2) / df['Vol']
